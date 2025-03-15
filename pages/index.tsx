@@ -127,24 +127,24 @@ export default function Home() {
   }, [hoveredSkill]);
 
   return (
-    <div className="h-dvh w-screen flex flex-col justify-center items-center bg-white relative overflow-hidden">
-      <div className="text-center z-10">
+    <div className="relative flex h-dvh w-screen flex-col items-center justify-center overflow-hidden bg-white">
+      <div className="z-10 text-center">
         <h1 ref={titleRef} className="text-5xl text-black">
           Am I Good At
         </h1>
 
-        <div className="overflow-hidden mt-4">
+        <div className="mt-4 overflow-hidden">
           <h2 ref={subtitleRef} className="text-2xl text-black">
             {displaySkill ? `At ${displaySkill}` : ""}
           </h2>
         </div>
       </div>
 
-      <div ref={circleRef} className="absolute top-1/2 left-1/2 w-0 h-0">
+      <div ref={circleRef} className="absolute top-1/2 left-1/2 h-0 w-0">
         {skills.map((skill, index) => (
           <Link
             key={index}
-            className="z-10 skill-bubble absolute text-xl bg-white border border-black/20 p-2 rounded-full aspect-square flex items-center justify-center w-14 h-14 shadow-sm opacity-0 scale-0"
+            className="skill-bubble absolute z-10 flex aspect-square h-14 w-14 scale-0 items-center justify-center rounded-full border border-black/20 bg-white p-2 text-xl opacity-0 shadow-sm"
             href={`/${getNameFromEmoji(skill)?.toLowerCase()}`}
             onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={handleMouseLeave}
