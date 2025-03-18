@@ -1,16 +1,18 @@
 import { SKILLS } from "@/lib/type";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
   const skills = Object.values(SKILLS);
   const circleRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLHeadingElement>(null);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const textAnimationRef = useRef<gsap.core.Animation | null>(null);
+  const [targetUrl, setTargetUrl] = useState<string | null>(null);
 
   const getNameFromEmoji = (emoji: string) => {
     return Object.entries(SKILLS).find(([key, value]) => value === emoji)?.[0];
@@ -104,6 +106,52 @@ export default function Home() {
     }
   }, [hoveredSkill]);
 
+  const playExitAnimation = (url: string) => {
+    if (!circleRef.current || !titleRef.current) return;
+
+    const bubbles = circleRef.current.querySelectorAll(".skill-bubble");
+    const timeline = gsap.timeline({
+      onComplete: () => {
+        router.push(url);
+      },
+    });
+
+    timeline.to(titleRef.current, {
+      opacity: 0,
+      filter: "blur(10px)",
+      duration: 0.5,
+      ease: "power1.in",
+    });
+
+    if (subtitleRef.current && subtitleRef.current.style.opacity !== "0") {
+      timeline.to(
+        subtitleRef.current,
+        {
+          opacity: 0,
+          y: -20,
+          duration: 0.3,
+          ease: "power1.in",
+        },
+        "-=0.3",
+      );
+    }
+
+    bubbles.forEach((bubble, index) => {
+      timeline.to(
+        bubble,
+        {
+          opacity: 0,
+          scale: 0,
+          duration: 0.3,
+          ease: "back.in(1.7)",
+        },
+        `-=${index > 0 ? 0.2 : 0}`,
+      );
+    });
+
+    return timeline;
+  };
+
   const handleMouseEnter = (index: number) => {
     const emojiValue = skills[index];
     const skillName = getNameFromEmoji(emojiValue);
@@ -116,6 +164,12 @@ export default function Home() {
 
   const handleMouseLeave = () => {
     setHoveredSkill(null);
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    e.preventDefault();
+    setTargetUrl(url);
+    playExitAnimation(url);
   };
 
   const [displaySkill, setDisplaySkill] = useState<string | null>(null);
@@ -134,24 +188,29 @@ export default function Home() {
         </h1>
 
         <div className="mt-4 overflow-hidden">
-          <h2 ref={subtitleRef} className="text-2xl text-black">
+          <h2 ref={subtitleRef} className="h-8 text-2xl text-black">
             {displaySkill ? `At ${displaySkill}` : ""}
           </h2>
         </div>
       </div>
 
       <div ref={circleRef} className="absolute top-1/2 left-1/2 h-0 w-0">
-        {skills.map((skill, index) => (
-          <Link
-            key={index}
-            className="skill-bubble absolute z-10 flex aspect-square h-14 w-14 scale-0 items-center justify-center rounded-full border border-black/20 bg-white p-2 text-xl opacity-0 shadow-sm"
-            href={`/${getNameFromEmoji(skill)?.toLowerCase()}`}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-          >
-            <p>{skill}</p>
-          </Link>
-        ))}
+        {skills.map((skill, index) => {
+          const skillName = getNameFromEmoji(skill);
+          const url = `/${skillName?.toLowerCase()}`;
+          return (
+            <a
+              key={index}
+              className="skill-bubble absolute z-10 flex aspect-square h-14 w-14 scale-0 cursor-pointer items-center justify-center rounded-full border border-black/20 bg-white p-2 text-xl opacity-0 shadow-sm hover:bg-black/5 hover:shadow-md"
+              href={url}
+              onClick={(e) => handleLinkClick(e, url)}
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
+            >
+              <p>{skill}</p>
+            </a>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-type RunningData = {
+export type RunningDataType = {
   oneKm: string;
   fiveKm: string;
   tenKm: string;
@@ -8,23 +8,21 @@ type RunningData = {
   marathonTime: string;
 };
 
-function timeToSeconds(timeStr: string): number {
+export function timeToSeconds(timeStr: string): number {
   if (!timeStr) return 0;
 
   const parts = timeStr.split(":").map(Number);
 
   if (parts.length === 2) {
-    // mm:ss format
     return parts[0] * 60 + parts[1];
   } else if (parts.length === 3) {
-    // hh:mm:ss format
     return parts[0] * 3600 + parts[1] * 60 + parts[2];
   }
 
   return 0;
 }
 
-const referenceData = {
+export const referenceData = {
   oneKm: {
     elite: 180, // 3:00
     good: 240, // 4:00
@@ -57,7 +55,7 @@ const referenceData = {
   },
 };
 
-export function calculateRunningPercentile(data: RunningData): number {
+export function runningPercentile(data: RunningDataType): number {
   let totalScore = 0;
   let divisor = 0;
 
@@ -114,4 +112,33 @@ export function calculateRunningPercentile(data: RunningData): number {
   if (divisor === 0) return 50;
   const averageScore = totalScore / divisor;
   return Math.round(averageScore);
+}
+
+export function formatTime(seconds: number): string {
+  if (seconds < 3600) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  } else {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+}
+
+export function getPerformanceLabel(score: number): string {
+  if (score >= 90) return "Elite";
+  if (score >= 70) return "Good";
+  if (score >= 40) return "Average";
+  if (score >= 20) return "Beginner";
+  return "Novice";
+}
+
+export function getPerformanceColor(score: number): string {
+  if (score >= 90) return "#4CAF50";
+  if (score >= 70) return "#8BC34A";
+  if (score >= 40) return "#FFC107";
+  if (score >= 20) return "#FF9800";
+  return "#F44336";
 }
