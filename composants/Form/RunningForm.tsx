@@ -1,4 +1,4 @@
-import { RunningDataType } from "@/lib/running-percentile";
+import { RunningDataType, timeRanges } from "@/lib/running-percentile";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { FormField } from "./FormFiled";
 
@@ -10,13 +10,13 @@ export const RunningForm = forwardRef<
   FormRefHandle,
   {
     runningData: RunningDataType;
-    onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFieldChange: (name: string, value: string) => void;
     onSubmit: (e: React.FormEvent) => void;
     validationError: string | null;
     formFieldRefs: React.MutableRefObject<HTMLDivElement[]>;
   }
 >((props, ref) => {
-  const { runningData, onInputChange, onSubmit, validationError, formFieldRefs } = props;
+  const { runningData, onFieldChange, onSubmit, formFieldRefs } = props;
   const formRef = useRef<HTMLFormElement>(null);
 
   const addFormItemRef = (el: HTMLDivElement | null) => {
@@ -31,7 +31,6 @@ export const RunningForm = forwardRef<
 
       timeline.from(formRef.current, {
         opacity: 0,
-        y: 30,
         duration: 0.5,
         ease: "power2.out",
       });
@@ -39,60 +38,51 @@ export const RunningForm = forwardRef<
   }));
 
   return (
-    <form
-      ref={formRef}
-      className="relative z-10 flex w-full max-w-md flex-col gap-8 bg-white p-6"
-      onSubmit={onSubmit}
-    >
+    <form ref={formRef} className="my-40 flex w-full max-w-md flex-col gap-8" onSubmit={onSubmit}>
       <FormField
         ref={addFormItemRef}
-        label="1km Time (mm:ss)"
+        label="1km Time"
         name="oneKm"
-        placeholder="e.g. 4:30"
-        value={runningData.oneKm}
-        required
-        onChange={onInputChange}
+        ranges={timeRanges.oneKm}
+        selectedValue={runningData.oneKm}
+        onChange={onFieldChange}
       />
 
       <FormField
         ref={addFormItemRef}
-        label="5km Time (mm:ss)"
+        label="5km Time"
         name="fiveKm"
-        placeholder="e.g. 25:00"
-        value={runningData.fiveKm}
-        required
-        onChange={onInputChange}
+        ranges={timeRanges.fiveKm}
+        selectedValue={runningData.fiveKm}
+        onChange={onFieldChange}
       />
 
       <FormField
         ref={addFormItemRef}
-        label="10km Time (hh:mm:ss)"
+        label="10km Time"
         name="tenKm"
-        placeholder="e.g. 55:30"
-        value={runningData.tenKm}
-        required
-        onChange={onInputChange}
+        ranges={timeRanges.tenKm}
+        selectedValue={runningData.tenKm}
+        onChange={onFieldChange}
       />
 
       <FormField
         ref={addFormItemRef}
-        label="Half Marathon Time (hh:mm:ss)"
+        label="Half Marathon Time"
         name="halfMarathonTime"
-        placeholder="e.g. 1:45:30"
-        value={runningData.halfMarathonTime}
-        onChange={onInputChange}
+        ranges={timeRanges.halfMarathon}
+        selectedValue={runningData.halfMarathonTime}
+        onChange={onFieldChange}
       />
 
       <FormField
         ref={addFormItemRef}
-        label="Marathon Time (hh:mm:ss)"
+        label="Marathon Time"
         name="marathonTime"
-        placeholder="e.g. 3:45:00"
-        value={runningData.marathonTime}
-        onChange={onInputChange}
+        ranges={timeRanges.marathon}
+        selectedValue={runningData.marathonTime}
+        onChange={onFieldChange}
       />
-
-      {validationError && <div className="mb-4 text-sm text-red-500">{validationError}</div>}
 
       <div ref={addFormItemRef} className="w-full">
         <button

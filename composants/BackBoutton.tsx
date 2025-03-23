@@ -9,7 +9,7 @@ export const BackButton = forwardRef<
   return (
     <button
       ref={ref}
-      className="absolute top-8 left-6 flex cursor-pointer items-center text-gray-400 transition-colors duration-300 hover:text-gray-600"
+      className="fixed top-6 left-6 flex cursor-pointer items-center text-gray-400 transition-colors duration-300 hover:text-gray-600 md:top-8"
       onClick={props.onClick}
     >
       <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@ export const BackButton = forwardRef<
           strokeWidth={1.5}
         />
       </svg>
-      Back to Skills
+      <span className="hidden md:block">Back to Skills</span>
     </button>
   );
 });

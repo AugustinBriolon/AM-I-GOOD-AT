@@ -8,7 +8,7 @@ export const Title = forwardRef<HTMLHeadingElement, TitleProps>(({ children }, r
   return (
     <h1
       ref={ref}
-      className="absolute top-12 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-5xl text-black"
+      className="text-center text-3xl text-black md:absolute md:top-12 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:transform md:text-5xl md:whitespace-nowrap"
     >
       {children}
     </h1>

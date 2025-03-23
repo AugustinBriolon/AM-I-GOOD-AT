@@ -1,15 +1,15 @@
 import { BackButton } from "@/composants/BackBoutton";
-import { RunnnigModal, ResultsRefHandle } from "@/composants/Modal/RunnnigModal";
-import { FormRefHandle, RunningForm } from "@/composants/Form/RunningForm";
+import { WeightliftingModal, ResultsRefHandle } from "@/composants/Modal/WeightliftingModal";
+import { FormRefHandle, WeightliftingForm } from "@/composants/Form/WeightliftingForm";
 import { Title } from "@/composants/Title";
-import { RunningDataType, runningPercentile } from "@/lib/running-percentile";
+import { WeightliftingDataType, weightliftingPercentile } from "@/lib/weightlifting-percentile";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-export default function Running() {
+export default function Weightlifting() {
   const router = useRouter();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
@@ -17,14 +17,14 @@ export default function Running() {
   const resultsRef = useRef<ResultsRefHandle>(null);
   const formItemsRef = useRef<HTMLDivElement[]>([]);
 
-  const [runningData, setRunningData] = useState<RunningDataType>({
-    oneKm: "",
-    fiveKm: "",
-    tenKm: "",
-    hasHalfMarathon: false,
-    halfMarathonTime: "",
-    hasMarathon: false,
-    marathonTime: "",
+  const [weightliftingData, setWeightliftingData] = useState<WeightliftingDataType>({
+    benchPress: "",
+    squat: "",
+    deadlift: "",
+    overheadPress: "",
+    pullUp: "",
+    bodyweight: "",
+    gender: "male",
   });
 
   const [score, setScore] = useState<number | null>(null);
@@ -69,37 +69,30 @@ export default function Running() {
   }, []);
 
   const handleFieldChange = (name: string, value: string) => {
-    if (name === "halfMarathonTime") {
-      setRunningData((prev) => ({
-        ...prev,
-        [name]: value,
-        hasHalfMarathon: value !== "",
-      }));
-    } else if (name === "marathonTime") {
-      setRunningData((prev) => ({
-        ...prev,
-        [name]: value,
-        hasMarathon: value !== "",
-      }));
-    } else {
-      setRunningData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    setWeightliftingData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const validateForm = (): boolean => {
-    const hasOneKm = runningData.oneKm.trim() !== "";
-    const hasFiveKm = runningData.fiveKm.trim() !== "";
-    const hasTenKm = runningData.tenKm.trim() !== "";
-    const hasHalfMarathon = runningData.halfMarathonTime.trim() !== "";
-    const hasMarathon = runningData.marathonTime.trim() !== "";
+    const hasBodyweight = weightliftingData.bodyweight.trim() !== "";
+    const hasBenchPress = weightliftingData.benchPress.trim() !== "";
+    const hasSquat = weightliftingData.squat.trim() !== "";
+    const hasDeadlift = weightliftingData.deadlift.trim() !== "";
+    const hasOverheadPress = weightliftingData.overheadPress.trim() !== "";
+    const hasPullUp = weightliftingData.pullUp.trim() !== "";
 
-    const hasAtLeastOneTime = hasOneKm || hasFiveKm || hasTenKm || hasHalfMarathon || hasMarathon;
+    if (!hasBodyweight) {
+      setValidationError("Please enter your bodyweight");
+      return false;
+    }
 
-    if (!hasAtLeastOneTime) {
-      setValidationError("Please enter at least one running time");
+    const hasAtLeastOneExercise =
+      hasBenchPress || hasSquat || hasDeadlift || hasOverheadPress || hasPullUp;
+
+    if (!hasAtLeastOneExercise) {
+      setValidationError("Please enter at least one exercise");
       return false;
     }
 
@@ -110,10 +103,12 @@ export default function Running() {
     e.preventDefault();
 
     if (!validateForm()) {
-      return toast.error("Please enter at least one running time");
+      return toast.error(
+        validationError || "Please enter your bodyweight and at least one exercise",
+      );
     }
 
-    const calculatedScore = runningPercentile(runningData);
+    const calculatedScore = weightliftingPercentile(weightliftingData);
     setScore(calculatedScore);
     setFormSubmitted(true);
 
@@ -156,24 +151,24 @@ export default function Running() {
     <div className="relative flex min-h-dvh w-screen flex-col items-center justify-start bg-white px-4">
       <div className="fixed z-20 flex w-full items-center justify-center bg-white py-12">
         <BackButton ref={backButtonRef} onClick={navigateBack} />
-        <Title ref={titleRef}>Am I Good At Running?</Title>
+        <Title ref={titleRef}>Am I Good At Weightlifting?</Title>
       </div>
 
-      <RunningForm
+      <WeightliftingForm
         ref={formRef}
         formFieldRefs={formItemsRef}
-        runningData={runningData}
         validationError={validationError}
+        weightliftingData={weightliftingData}
         onFieldChange={handleFieldChange}
         onSubmit={handleSubmit}
       />
 
       {formSubmitted && (
-        <RunnnigModal
+        <WeightliftingModal
           ref={resultsRef}
           isVisible={formSubmitted}
-          runningData={runningData}
           score={score}
+          weightliftingData={weightliftingData}
           onClose={handleCloseResults}
         />
       )}

@@ -25,9 +25,13 @@ body {
   font-family: var(--font-sans);
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 @font-face {
   font-family: 'SourceCodePro';
   src: url('/font/SourceCodePro.ttf') format('truetype');
 }
-
-
