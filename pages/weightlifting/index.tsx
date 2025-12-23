@@ -1,18 +1,13 @@
-import { BackButton } from "@/composants/BackBoutton";
-import { WeightliftingModal, ResultsRefHandle } from "@/composants/Modal/WeightliftingModal";
 import { FormRefHandle, WeightliftingForm } from "@/composants/Form/WeightliftingForm";
-import { Title } from "@/composants/Title";
+import { ResultsRefHandle, WeightliftingModal } from "@/composants/Modal/WeightliftingModal";
+import PageHeader from "@/composants/PageHeader";
 import { WeightliftingDataType, weightliftingPercentile } from "@/lib/weightlifting-percentile";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function Weightlifting() {
-  const router = useRouter();
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const backButtonRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<FormRefHandle>(null);
   const resultsRef = useRef<ResultsRefHandle>(null);
   const formItemsRef = useRef<HTMLDivElement[]>([]);
@@ -32,17 +27,9 @@ export default function Weightlifting() {
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useGSAP(() => {
-    if (!titleRef.current || !formRef.current || !backButtonRef.current) return;
+    if (!formRef.current) return;
 
     const tl = gsap.timeline();
-
-    tl.from(titleRef.current, {
-      opacity: 0,
-      filter: "blur(10px)",
-      y: -30,
-      duration: 1,
-      ease: "power1.out",
-    });
 
     formRef.current.animate(tl);
 
@@ -55,17 +42,6 @@ export default function Weightlifting() {
         ease: "power1.out",
       });
     }
-
-    tl.from(
-      backButtonRef.current,
-      {
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.5,
-        ease: "back.out(1.7)",
-      },
-      "-=0.2",
-    );
   }, []);
 
   const handleFieldChange = (name: string, value: string) => {
@@ -122,37 +98,9 @@ export default function Weightlifting() {
     setScore(null);
   };
 
-  const playExitAnimation = () => {
-    return new Promise<void>((resolve) => {
-      const elements = [titleRef.current, backButtonRef.current, formItemsRef.current].filter(
-        Boolean,
-      );
-
-      const tl = gsap.timeline({
-        onComplete: () => resolve(),
-      });
-
-      tl.to(elements, {
-        opacity: 0,
-        y: 30,
-        duration: 0.4,
-        stagger: 0.2,
-        ease: "power2.in",
-      });
-    });
-  };
-
-  const navigateBack = async () => {
-    await playExitAnimation();
-    router.push("/");
-  };
-
   return (
     <div className="relative flex min-h-dvh w-screen flex-col items-center justify-start bg-white px-4">
-      <div className="fixed z-20 flex w-full items-center justify-center bg-white py-12">
-        <BackButton ref={backButtonRef} onClick={navigateBack} />
-        <Title ref={titleRef}>Am I Good At Weightlifting?</Title>
-      </div>
+      <PageHeader title="Weightlifting" />
 
       <WeightliftingForm
         ref={formRef}
